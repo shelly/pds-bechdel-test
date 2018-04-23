@@ -10,7 +10,10 @@ import matplotlib.pyplot as plt
 # Year: Year the movie was released
 # Bechdel_Rating: 0 = no two women, 1 = no talking, 2 = no talking about men, 3 = passing
 
-data = pd.read_csv('movie_data.csv', names=['Title', 'IMDB_ID', 'Year', 'Bechdel_Rating'])
+data = pd.read_csv('movie_data.csv', 
+					dtype=object, 
+					names=['Title', 'IMDB_ID', 'Year', 'Bechdel_Rating']
+				  )
 print(data.shape)
 print(data.head())
 print(data.tail())
