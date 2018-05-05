@@ -3,7 +3,7 @@ import requests, csv
 response = requests.get('http://bechdeltest.com/api/v1/getAllMovies')
 parsed = response.json()
 
-output_file = open('movie_data.csv', 'w')
+output_file = open('bechdel_test_data.csv', 'w')
 
 for movie in parsed:
 	if movie['title'] and movie['imdbid'] and movie['year'] and movie['rating']:

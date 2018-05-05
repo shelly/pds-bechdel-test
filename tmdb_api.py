@@ -1,17 +1,32 @@
-import requests, time, csv  
+import requests, time  
 import pandas as pd 
 
-api_key = ''
-base_tmdb_url = 'https://api.themoviedb.org/3'
+api_key = 'a4a3dc6220c1d494515cbef159badb43'
+base_tmdb_url = 'http://api.themoviedb.org/3'
 
-data = pd.read_csv('movie_data.csv', dtype=object, names=['Title', 'IMDB_ID', 'Year', 'Bechdel_Rating'])
-output_file = open('movie_data_with_tmdb.csv', 'w')
+bechdel_data = pd.read_csv('bechdel_test_data.csv', dtype=object, names=['Title', 
+	'IMDB_ID', 'Year', 'Bechdel_Rating'])
+df = pd.DataFrame(columns=['Title', 
+						   'IMDB_ID', 
+						   'Year', 
+						   'Bechdel_Rating', 
+						   'TMDB_ID',
+						   'Budget', 
+						   'Overview',
+						   'Popularity',
+						   'Revenue',
+						   'Genres',
+						   'Cast',
+						   'Crew',
+						   'Recommendations',
+						  ])
 
+#Movie /find/ -> TMDB ID 
 def imdb_to_tmdb(imdb_id): 
 	path = '/find/tt' + str(imdb_id)
 	
-	r = requests.get(base_tmdb_url + path, params = {'api_key': api_key, 
-															'external_source': 'imdb_id'})
+	r = requests.get(base_tmdb_url + path, 
+		params = {'api_key': api_key,'external_source': 'imdb_id'})
 	
 	if r.status_code is requests.codes.ok:
 		parsed = r.json()
@@ -20,9 +35,32 @@ def imdb_to_tmdb(imdb_id):
 			if 'id' in movie:
 				return movie['id']
 
-def cast_crew_female(tmdb_id): 
-	first_billed_is_female = 0
-	director_is_female = 0  
+# GetDetails
+	# Budget
+	# Overview 
+	# Popularity 
+	# Revenue 
+	# Genres: List [{id: , name: }]
+def get_details(tmdb_id): 
+	path = '/movie/{0}'.format(tmdb_id)
+
+	r = requests.get(base_tmdb_url + path, params = {'api_key': api_key})
+
+	if r.status_code is requests.codes.ok:
+		parsed = r.json()
+		return (parsed['title'],
+			    parsed['budget'], 
+			    parsed['overview'], 
+			    parsed['popularity'],
+			    parsed['revenue'],
+			    parsed['genres']) 
+
+# GetCredits
+	# Cast: List[{id: , order: }]
+	# Crew: List[{id: , job: , department: }]
+def get_credits(tmdb_id): 
+	cast = list()
+	crew = list() 
 	path = '/movie/{0}/credits'.format(tmdb_id)
 
 	r = requests.get(base_tmdb_url + path, params = {'api_key': api_key})
@@ -30,36 +68,61 @@ def cast_crew_female(tmdb_id):
 	if r.status_code is requests.codes.ok:
 		parsed = r.json()
 		
-		if 'cast' in parsed and len(parsed['cast']) > 0:
-			first_billed = parsed['cast'][0]
-			first_billed_is_female = int('gender' in first_billed and first_billed['gender'] is 1)
+		if 'cast' in parsed:
+			cast_obj = parsed['cast']
+			cast = list(map(lambda person: {'id': person['id'], 
+											'order': person['order'],
+											'character': person['character'],
+											}, cast_obj))
 		
 		if 'crew' in parsed:
-			find_female_dirs = lambda obj: ('job' in obj 
-											and 'gender' in obj 
-											and obj['job'] == 'Director' 
-											and obj['gender'] is 1
-											) 
-			female_directors = list(filter(find_female_dirs, parsed['crew']))
-			director_is_female = int(len(female_directors) > 0)
+			crew_obj = parsed['crew']
+			crew = list(map(lambda person: {'id': person['id'], 
+											'department': person['department'], 
+											'job': person['job'],
+											}, crew_obj))
 	
-	return (first_billed_is_female, director_is_female)
+	return (cast, crew)
 
-for index, movie in data.iterrows():
+# GetRecommendations
+	# recommendations: List [id]
+def get_recommendations(tmdb_id): 
+	recommendations = list()
+	path = '/movie/{0}/recommendations'.format(tmdb_id)
+
+	r = requests.get(base_tmdb_url + path, params = {'api_key': api_key})
+
+	if r.status_code is requests.codes.ok:
+		parsed = r.json() 
+		if 'results' in parsed:
+			recommendations = [rec['id'] for rec in parsed['results']][:5]
+
+	return recommendations 
+
+
+for index, movie in bechdel_data.iterrows():
 	tmdb_id = imdb_to_tmdb(movie['IMDB_ID'])
 	time.sleep(0.3)
 	if tmdb_id:
-		(first_billed, director) = cast_crew_female(tmdb_id)
+		(title, budget, overview, popularity, revenue, genres) = get_details(tmdb_id)
+		time.sleep(0.3)
+		(cast, crew) = get_credits(tmdb_id)
+		time.sleep(0.3)
+		recommendations = get_recommendations(tmdb_id)
 		time.sleep(0.3)
 
-		row = ','.join([movie['Title'], 
-					    movie['IMDB_ID'], 
-					    movie['Year'], 
-					    movie['Bechdel_Rating'], 
-					    str(first_billed), 
-					    str(director)]
-					   )
+		df.loc[index] = [title, 
+	    movie['IMDB_ID'], 
+	    movie['Year'], 
+	    movie['Bechdel_Rating'],
+	    tmdb_id,
+	    budget,
+	    overview,
+	    popularity,
+	    revenue,
+	    genres, 
+	    cast,
+	    crew, 
+	    recommendations]
 
-		output_file.write('{0}\n'.format(row))
-
-output_file.close()
+df.to_csv('movies.csv')
