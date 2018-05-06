@@ -142,32 +142,17 @@ def get_female_writing_score():
 		ind += 1
 	return scores
 
-# Returns 0/1 indicating whether or not recs pass the Bechdel Test
-# where passing the Bechdel Test is rating = 3
-def recs_passing():
-	pass
-	# recs = movie_data['Recommendations']
-	# ids = movie_by_id.index
-	# passing = np.zeros(recs.shape)
-	# ind = 0
-	# for rec in recs:
-	# 	for movie_id in rec:
-	# 		if (movie_id in ids):
-	# 			movie_info = movie_by_id.loc[movie_id]
-	# 			print(movie_info['Bechdel_Rating'])
-	# 			# movie_rating = int(movie_info['Bechdel_Rating'] > 2)
-	# 			# if movie_rating:
-	# 			# 	passing[ind] = 1
-	# 	ind += 1
-	# return passing
-
 # Returns fraction of recommendations that pass Bechdel Test
 def recs_passing_score():
 	pass
 
 # Returns average Bechdel Test score of the recommendations
 def recs_passing_avg_score():
-	pass
+	recs = movie_data['Recommendations']
+	for rec in recs:
+		for movie_id in rec:
+			print(movie_by_id.loc[movie_id])
+	return 0
 
 # print(get_rev_budget_ratio())
 # print(get_female_directing())
@@ -178,7 +163,7 @@ def recs_passing_avg_score():
 # print(get_female_writing_score())
 # print(recs_passing())
 # print(recs_passing_score())
-# print(recs_passing_avg_score())
+print(recs_passing_avg_score())
 
 
 
