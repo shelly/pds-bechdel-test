@@ -1,10 +1,5 @@
 import pandas as pd 
 
-# Necessary to get matplotlib to import correctly.
-import matplotlib as mpl
-mpl.use('TkAgg')
-import matplotlib.pyplot as plt
-
 # Title: Movie title
 # IMDB_ID: IMDB ID
 # Year: Year the movie was released
