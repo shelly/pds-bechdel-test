@@ -33,4 +33,20 @@ def passing_over_year():
 
 	plt.show()
 
-passing_over_year()
+def passing_over_budget():
+	# Buckets of $10 million 
+	budgets = movies['Budget'][movies['Budget'] > 0]
+	map_to_bud = budgets.apply(lambda year: int(year) // 10000000 * 10000000)
+	ind = list(range(0, 210000000, 10000000))
+
+	y_data = [0]*len(ind)
+	for i in range(len(ind)):
+		if (ind[i] == 200000000):
+			y_data[i] = (map_to_bud[map_to_bud >= ind[i]]).shape[0]
+		else:
+			y_data[i] = (map_to_bud[map_to_bud == ind[i]]).shape[0]
+
+	bar_width = 0.5
+	plt.bar(range(len(ind)), y_data, width=bar_width)
+	plt.xticks(range(len(ind)), tuple(map(lambda x: x // 10000000, ind)))
+	plt.show()
