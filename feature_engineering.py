@@ -342,22 +342,4 @@ def ave_bechdel_dir_score():
 		scores[ind] = (dir_score / num_dirs) if (num_dirs > 0) else np.nan
 		ind += 1
 	return scores  
-
-print(ave_bechdel_dir_score())
-
-# print(get_rev_budget_ratio())
-# print(get_female_directing())
-# print(get_female_directing_score())
-# print(get_female_cast())
-# print(get_female_cast_score())
-# print(get_female_writing())
-# print(get_female_writing_score())
-# print(recs_passing())
-# print(recs_passing_score())
-# print(recs_passing_avg_score())
-# print(average_age_of_director())
-# print(average_age_of_cast())
-# print(genres_one_hot())
-# print(ave_pop_directors())
-# print(ave_pop_cast())
-
+	
