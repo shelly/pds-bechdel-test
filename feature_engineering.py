@@ -3,6 +3,8 @@ from load_data import get_people
 from sklearn.svm import SVC
 import pandas as pd
 import numpy as np
+from functools import reduce 
+from collections import defaultdict 
 
 movie_data = get_movies()
 movie_by_id = movie_data.set_index('TMDB_ID')
@@ -261,6 +263,87 @@ def ave_pop_cast():
 			pops[ind] = total_pop / total_casts
 		ind += 1
 	return pops
+
+def first_billed_female():
+	casts = movie_data['Cast']
+	first_billeds = np.zeros(casts.shape)
+	ind = 0
+	for cast in casts:
+		min_order_fn = lambda p1, p2: p1 if ('order' in p1 
+			and 'order' in p2 and p1['order'] < p2['order']) else p2
+		first_billed = reduce(min_order_fn, cast, {})
+		if len(first_billed) > 0 and int(first_billed['id']) in people_data.index:
+			gender = people_data.loc[int(first_billed['id'])]['Gender']
+			if gender == 0:
+				first_billeds[ind] = np.nan # Not set
+			elif gender == 1:
+				first_billeds[ind] = 1 # Not set
+			elif gender == 2:
+				first_billeds[ind] = 0 # Not set
+		else:
+			first_billeds[ind] = np.nan # Not set
+		ind += 1
+	return first_billeds 
+
+def generate_cast_to_movies_map():
+
+	cast_to_movies = defaultdict(list)
+	for movie_tmdb_id in movie_data.index:
+		cast = movie_data.loc[movie_tmdb_id]['Cast']
+		for mem in cast:
+			person_id = int(mem['id'])
+			cast_to_movies[person_id].append(movie_tmdb_id)
+
+	return cast_to_movies
+
+def ave_bechdel_cast_score():
+	scores = np.zeros(movie_data.shape[0])
+	cast_to_movies = generate_cast_to_movies_map()
+	ind = 0
+	for movie_tmdb_id in movie_data.index:
+		cast = movie_data.loc[movie_tmdb_id]['Cast']
+		cast_score = 0
+		for mem in cast:
+			person_id = int(mem['id'])
+			person_movies = cast_to_movies[person_id]
+			cast_score += sum(map(lambda movie: movie_data.loc[movie]['Bechdel_Rating'], 
+				person_movies))/len(person_movies)
+		scores[ind] = (cast_score / len(cast)) if (len(cast) > 0) else np.nan
+		ind += 1
+	return scores  
+
+def generate_directors_to_movies_map():
+
+	dirs_to_movies = defaultdict(list)
+	for movie_tmdb_id in movie_data.index:
+		crew = movie_data.loc[movie_tmdb_id]['Crew']
+		for mem in crew:
+			if (mem['department'] == 'Directing'):
+				person_id = int(mem['id'])
+				dirs_to_movies[person_id].append(movie_tmdb_id)
+
+	return dirs_to_movies
+
+def ave_bechdel_dir_score():
+	scores = np.zeros(movie_data.shape[0])
+	dirs_to_movies = generate_directors_to_movies_map()
+	ind = 0
+	for movie_tmdb_id in movie_data.index:
+		crew = movie_data.loc[movie_tmdb_id]['Crew']
+		dir_score = 0
+		num_dirs = 0
+		for mem in crew:
+			if (mem['department'] == 'Directing'):
+				num_dirs += 1
+				person_id = int(mem['id'])
+				person_movies = dirs_to_movies[person_id]
+				dir_score += sum(map(lambda movie: movie_data.loc[movie]['Bechdel_Rating'], 
+					person_movies))/len(person_movies)
+		scores[ind] = (dir_score / num_dirs) if (num_dirs > 0) else np.nan
+		ind += 1
+	return scores  
+
+print(ave_bechdel_dir_score())
 
 # print(get_rev_budget_ratio())
 # print(get_female_directing())
