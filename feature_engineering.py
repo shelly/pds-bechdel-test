@@ -28,7 +28,7 @@ def get_female_directing():
 				if (person_id in ids):
 					person_info = people_data.loc[person_id]
 					person_gender = person_info['Gender']
-					if (person_gender):
+					if (person_gender == 1):
 						fem_dir[ind] = 1
 		ind += 1
 	return fem_dir
@@ -49,11 +49,9 @@ def get_female_directing_score():
 					directors += 1
 					person_info = people_data.loc[person_id]
 					person_gender = person_info['Gender']
-					if (person_gender):
+					if (person_gender == 1):
 						fem_dir += 1
-		if (directors == 0):
-			scores[ind] = 0
-		else:
+		if (directors != 0):
 			scores[ind] = fem_dir/directors
 		ind += 1
 	return scores
@@ -70,7 +68,7 @@ def get_female_cast():
 			if (person_id in ids):
 				person_info = people_data.loc[person_id]
 				person_gender = person_info['Gender']
-				if (person_gender):
+				if (person_gender == 1):
 					fem_cast[ind] = 1
 		ind += 1
 	return fem_cast
@@ -90,11 +88,9 @@ def get_female_cast_score():
 				num_cast += 1
 				person_info = people_data.loc[person_id]
 				person_gender = person_info['Gender']
-				if (person_gender):
+				if (person_gender == 1):
 					num_fem += 1
-		if (num_cast == 0):
-			scores[ind] = 0
-		else:
+		if (num_cast != 0):
 			scores[ind] = num_fem/num_cast
 		ind += 1
 	return scores
@@ -112,7 +108,7 @@ def get_female_writing():
 				if (person_id in ids):
 					person_info = people_data.loc[person_id]
 					person_gender = person_info['Gender']
-					if (person_gender):
+					if (person_gender == 1):
 						fem_writ[ind] = 1
 		ind += 1
 	return fem_writ
@@ -133,26 +129,138 @@ def get_female_writing_score():
 					writers += 1
 					person_info = people_data.loc[person_id]
 					person_gender = person_info['Gender']
-					if (person_gender):
+					if (person_gender == 1):
 						fem_writ += 1
-		if (writers == 0):
-			scores[ind] = 0
-		else:
+		if (writers != 0):
 			scores[ind] = fem_writ/writers
 		ind += 1
 	return scores
 
-# Returns fraction of recommendations that pass Bechdel Test
-def recs_passing_score():
-	pass
-
 # Returns average Bechdel Test score of the recommendations
 def recs_passing_avg_score():
 	recs = movie_data['Recommendations']
+	ids = movie_by_id.index
+	scores = np.zeros(recs.shape)
+	ind = 0
 	for rec in recs:
+		num_recs = len(rec)
+		total = 0
 		for movie_id in rec:
-			print(movie_by_id.loc[movie_id])
-	return 0
+			if (movie_id in ids):
+				rating = (movie_by_id.loc[movie_id]['Bechdel_Rating'])
+				if (isinstance(rating, np.int64)):
+					total += rating
+		if (num_recs > 0):
+			scores[ind] = total / num_recs
+		ind += 1
+	return scores
+
+# Returns the average age of the directors
+def average_age_of_director():
+	year = movie_data['Year']
+	crews = movie_data['Crew']
+	ages = np.zeros(crews.shape)
+	ids = people_data.index
+	ind = 0
+	for crew in crews:
+		total_age = 0
+		total_dirs = 0
+		for mem in crew:
+			if (mem['department'] == 'Directing'):
+				person_id = int(mem['id'])
+				if (person_id in ids):
+					person_info = people_data.loc[person_id]
+					birthday = person_info['Birthday']
+					if (type(birthday) == str):
+						birthyear = int(birthday[:4])
+						age = year[ind] - birthyear
+						total_dirs += 1
+						total_age += age
+		if (total_dirs != 0):
+			ages[ind] = total_age / total_dirs
+		ind += 1
+	return ages
+
+# Returns the average age of the cast
+def average_age_of_cast():
+	year = movie_data['Year']
+	casts = movie_data['Cast']
+	ages = np.zeros(casts.shape)
+	ids = people_data.index
+	ind = 0
+	for cast in casts:
+		total_age = 0
+		total_cast = 0
+		for mem in cast:
+			person_id = int(mem['id'])
+			if (person_id in ids):
+				person_info = people_data.loc[person_id]
+				birthday = person_info['Birthday']
+				if (type(birthday) == str):
+					birthyear = int(birthday[:4])
+					age = year[ind] - birthyear
+					total_cast += 1
+					total_age += age
+		if (total_cast != 0):
+			ages[ind] = total_age / total_cast
+		ind += 1
+	return ages
+
+# Returns one hot enconding of genres
+def genres_one_hot(): 
+	df = pd.DataFrame() 
+	genres = ['Western', 'TV Movie', 'Family', 'Comedy', 
+			  'Action', 'Crime', 'Horror', 'Animation', 
+			  'Thriller', 'Adventure', 'Fantasy', 'War', 
+			  'Science Fiction', 'Drama', 'Documentary', 
+			  'History', 'Mystery', 'Romance', 'Music'] 
+	genre_names = movie_data['Genres'].apply( lambda li: [genre['name'] for genre in li]) 
+	for genre in genres: 
+		df[genre] = genre_names.apply(lambda li: int(genre in li)) 
+	return df
+
+# Returns average popularity of directors
+def ave_pop_directors():
+	crews = movie_data['Crew']
+	pops = np.zeros(crews.shape)
+	ids = people_data.index
+	ind = 0
+	for crew in crews:
+		total_pop = 0
+		total_dirs = 0
+		for mem in crew:
+			if (mem['department'] == 'Directing'):
+				person_id = int(mem['id'])
+				if (person_id in ids):
+					person_info = people_data.loc[person_id]
+					pop = person_info['Popularity']
+					total_dirs += 1
+					total_pop += pop
+		if (total_dirs != 0):
+			pops[ind] = total_pop / total_dirs
+		ind += 1
+	return pops
+
+# Returns average popularity of cast
+def ave_pop_cast():
+	casts = movie_data['Cast']
+	pops = np.zeros(casts.shape)
+	ids = people_data.index
+	ind = 0
+	for cast in casts:
+		total_pop = 0
+		total_casts = 0
+		for mem in cast:
+			person_id = int(mem['id'])
+			if (person_id in ids):
+				person_info = people_data.loc[person_id]
+				pop = person_info['Popularity']
+				total_casts += 1
+				total_pop += pop
+		if (total_casts != 0):
+			pops[ind] = total_pop / total_casts
+		ind += 1
+	return pops
 
 # print(get_rev_budget_ratio())
 # print(get_female_directing())
@@ -163,8 +271,10 @@ def recs_passing_avg_score():
 # print(get_female_writing_score())
 # print(recs_passing())
 # print(recs_passing_score())
-print(recs_passing_avg_score())
-
-
-
+# print(recs_passing_avg_score())
+# print(average_age_of_director())
+# print(average_age_of_cast())
+# print(genres_one_hot())
+# print(ave_pop_directors())
+# print(ave_pop_cast())
 
