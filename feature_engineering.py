@@ -414,6 +414,7 @@ def ave_bechdel_dir_score():
 		ind += 1
 	return scores  
 
+
 # print(get_rev_budget_ratio())
 # print(get_female_directing())
 # print(get_female_directing_score())
@@ -428,3 +429,5 @@ def ave_bechdel_dir_score():
 # print(ave_pop_directors())
 # print(ave_pop_cast())
 # print(ave_bechdel_dir_score())
+
+
