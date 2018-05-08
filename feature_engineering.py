@@ -94,12 +94,13 @@ def get_female_cast():
 			no_gend = 0
 			for mem in cast:
 				person_id = int(mem['id'])
+				person_order = int(mem['order'])
 				if (person_id in people_data.index):
 					person_info = people_data.loc[person_id]
 					person_gender = person_info['Gender']
 					if (person_gender == 0):
 						no_gend += 1
-					if (person_gender == 1):
+					if (person_gender == 1 and person_order < 3):
 						fem_cast[ind] = 1
 			if (no_gend > 0 and fem_cast[ind] != 1):
 				fem_cast[ind] = float('nan')
@@ -201,18 +202,21 @@ def recs_passing_avg_score():
 	ind = 0
 	for rec in recs:
 		num_recs = len(rec)
-		tot_recs = 0
 		if (num_recs == 0):
 			scores[ind] = float('nan')
 		else:
 			total = 0
+			tot_recs = 0
 			for movie_id in rec:
 				if (movie_id in movie_by_id.index):
 					rating = (movie_by_id.loc[movie_id]['Bechdel_Rating'])
 					if (isinstance(rating, np.int64)):
 						total += rating
 						tot_recs += 1
-			scores[ind] = total / tot_recs
+			if (tot_recs != 0):
+				scores[ind] = total / tot_recs
+			else:
+				scores[ind] = float('nan')
 		ind += 1
 	return scores
 
@@ -241,6 +245,8 @@ def average_age_of_director():
 							total_age += age
 			if (total_dirs != 0):
 				ages[ind] = total_age / total_dirs
+			else:
+				ages[ind] = float('nan')
 		ind += 1
 	return ages
 
@@ -269,6 +275,8 @@ def average_age_of_cast():
 						total_age += age
 			if (total_cast != 0):
 				ages[ind] = total_age / total_cast
+			else:
+				ages[ind] = float('nan')
 		ind += 1
 	return ages
 
@@ -305,6 +313,8 @@ def ave_pop_directors():
 						total_pop += pop
 		if (total_dirs != 0):
 			pops[ind] = total_pop / total_dirs
+		else:
+			pops[ind] = float('nan')
 		ind += 1
 	return pops
 
@@ -327,6 +337,8 @@ def ave_pop_cast():
 					total_pop += pop
 		if (total_casts != 0):
 			pops[ind] = total_pop / total_casts
+		else:
+			pops[ind] = float('nan')
 		ind += 1
 	return pops
 
