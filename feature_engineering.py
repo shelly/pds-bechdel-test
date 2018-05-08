@@ -15,7 +15,13 @@ people_data = people_data.set_index('TMDB_ID')
 def get_rev_budget_ratio():
 	rev = movie_data['Revenue']
 	budget = movie_data['Budget']
-	return np.divide(rev, budget)
+	ans = np.zeros(rev.shape)
+	for ind in range(rev.shape[0]):
+		cur_rev = rev[ind]
+		cur_budg = budget[ind]
+		if ((cur_rev == 0) or (cur_budg == 0)):
+			ans[ind] = float('nan')
+	return ans
 
 # Returns 0/1 indicating whether or not there was a female director
 def get_female_directing():
@@ -24,14 +30,22 @@ def get_female_directing():
 	ids = people_data.index
 	ind = 0
 	for crew in crews:
-		for mem in crew:
-			if (mem['department'] == 'Directing'):
-				person_id = int(mem['id'])
-				if (person_id in ids):
-					person_info = people_data.loc[person_id]
-					person_gender = person_info['Gender']
-					if (person_gender == 1):
-						fem_dir[ind] = 1
+		if (len(crew) == 0):
+			fem_dir[ind] = float('nan')
+		else:
+			no_gend = 0
+			for mem in crew:
+				if (mem['department'] == 'Directing'):
+					person_id = int(mem['id'])
+					if (person_id in ids):
+						person_info = people_data.loc[person_id]
+						person_gender = person_info['Gender']
+						if (person_gender == 0):
+							no_gend += 1
+						if (person_gender == 1):
+							fem_dir[ind] = 1
+			if (no_gend == len(crew)):
+				fem_dir[ind] = float('nan')
 		ind += 1
 	return fem_dir
 
@@ -44,17 +58,27 @@ def get_female_directing_score():
 	for crew in crews:
 		directors = 0
 		fem_dir = 0
-		for mem in crew:
-			if (mem['department'] == 'Directing'):
-				person_id = int(mem['id'])
-				if (person_id in ids):
-					directors += 1
-					person_info = people_data.loc[person_id]
-					person_gender = person_info['Gender']
-					if (person_gender == 1):
-						fem_dir += 1
-		if (directors != 0):
-			scores[ind] = fem_dir/directors
+		if (len(crew) == 0):
+			scores[ind] = float('nan')
+		else:
+			no_gend = 0
+			for mem in crew:
+				if (mem['department'] == 'Directing'):
+					person_id = int(mem['id'])
+					if (person_id in ids):
+						person_info = people_data.loc[person_id]
+						person_gender = person_info['Gender']
+						if (person_gender == 0):
+							no_gend += 1
+						if (person_gender != 0):
+							directors += 1
+						if (person_gender == 1):
+							fem_dir += 1
+			if (directors != 0):
+				if (no_gend == len(crew)):
+					scores[ind] = float('nan')
+				else:
+					scores[ind] = fem_dir/directors
 		ind += 1
 	return scores
 
@@ -65,13 +89,21 @@ def get_female_cast():
 	ids = people_data.index
 	ind = 0
 	for cast in casts:
-		for mem in cast:
-			person_id = int(mem['id'])
-			if (person_id in ids):
-				person_info = people_data.loc[person_id]
-				person_gender = person_info['Gender']
-				if (person_gender == 1):
-					fem_cast[ind] = 1
+		if (len(cast) == 0):
+			fem_cast[ind] = float('nan')
+		else:
+			no_gend = 0
+			for mem in cast:
+				person_id = int(mem['id'])
+				if (person_id in ids):
+					person_info = people_data.loc[person_id]
+					person_gender = person_info['Gender']
+					if (person_gender == 0):
+						no_gend += 1
+					if (person_gender == 1):
+						fem_cast[ind] = 1
+			if (no_gend == len(cast)):
+				fem_cast[ind] = float('nan')
 		ind += 1
 	return fem_cast
 
@@ -82,18 +114,28 @@ def get_female_cast_score():
 	ids = people_data.index
 	ind = 0
 	for cast in casts:
-		num_cast = 0
-		num_fem = 0
-		for mem in cast:
-			person_id = int(mem['id'])
-			if (person_id in ids):
-				num_cast += 1
-				person_info = people_data.loc[person_id]
-				person_gender = person_info['Gender']
-				if (person_gender == 1):
-					num_fem += 1
-		if (num_cast != 0):
-			scores[ind] = num_fem/num_cast
+		if (len(cast) == 0):
+			scores[ind] = float('nan')
+		else:
+			num_cast = 0
+			num_fem = 0
+			no_gend = 0
+			for mem in cast:
+				person_id = int(mem['id'])
+				if (person_id in ids):
+					person_info = people_data.loc[person_id]
+					person_gender = person_info['Gender']
+					if (person_gender == 0):
+						no_gend += 1
+					if (person_gender != 0):
+						num_cast += 1
+					if (person_gender == 1):
+						num_fem += 1
+			if (num_cast != 0):
+				if (no_gend == len(cast)):
+					scores[ind] = float('nan')
+				else:
+					scores[ind] = num_fem/num_cast
 		ind += 1
 	return scores
 
@@ -104,14 +146,22 @@ def get_female_writing():
 	ids = people_data.index
 	ind = 0
 	for crew in crews:
-		for mem in crew:
-			if (mem['department'] == 'Writing'):
-				person_id = int(mem['id'])
-				if (person_id in ids):
-					person_info = people_data.loc[person_id]
-					person_gender = person_info['Gender']
-					if (person_gender == 1):
-						fem_writ[ind] = 1
+		if (len(crew) == 0):
+			fem_writ[ind] = float('nan')
+		else:
+			no_gend = 0
+			for mem in crew:
+				if (mem['department'] == 'Writing'):
+					person_id = int(mem['id'])
+					if (person_id in ids):
+						person_info = people_data.loc[person_id]
+						person_gender = person_info['Gender']
+						if (person_gender == 0):
+							no_gend += 1
+						if (person_gender == 1):
+							fem_writ[ind] = 1
+			if (no_gend == len(crew)):
+				fem_writ[ind] == float('nan')
 		ind += 1
 	return fem_writ
 
@@ -122,37 +172,48 @@ def get_female_writing_score():
 	ids = people_data.index
 	ind = 0
 	for crew in crews:
-		writers = 0
-		fem_writ = 0
-		for mem in crew:
-			if (mem['department'] == 'Writing'):
-				person_id = int(mem['id'])
-				if (person_id in ids):
-					writers += 1
-					person_info = people_data.loc[person_id]
-					person_gender = person_info['Gender']
-					if (person_gender == 1):
-						fem_writ += 1
-		if (writers != 0):
-			scores[ind] = fem_writ/writers
+		if (len(crew) == 0):
+			scores[ind] == float('nan')
+		else:
+			writers = 0
+			fem_writ = 0
+			no_gend = 0
+			for mem in crew:
+				if (mem['department'] == 'Writing'):
+					person_id = int(mem['id'])
+					if (person_id in ids):
+						person_info = people_data.loc[person_id]
+						person_gender = person_info['Gender']
+						if (person_gender == 0):
+							no_gend += 1
+						if (person_gender != 0):
+							writers += 1
+						if (person_gender == 1):
+							fem_writ += 1
+			if (writers != 0):
+				if (no_gend == len(crew)):
+					scores[ind] = float('nan')
+				else:
+					scores[ind] = fem_writ/writers
 		ind += 1
 	return scores
 
 # Returns average Bechdel Test score of the recommendations
 def recs_passing_avg_score():
 	recs = movie_data['Recommendations']
-	ids = movie_by_id.index
 	scores = np.zeros(recs.shape)
 	ind = 0
 	for rec in recs:
 		num_recs = len(rec)
-		total = 0
-		for movie_id in rec:
-			if (movie_id in ids):
-				rating = (movie_by_id.loc[movie_id]['Bechdel_Rating'])
-				if (isinstance(rating, np.int64)):
-					total += rating
-		if (num_recs > 0):
+		if (num_recs == 0):
+			scores[ind] = float('nan')
+		else:
+			total = 0
+			for movie_id in rec:
+				if (movie_id in movie_by_id.index):
+					rating = (movie_by_id.loc[movie_id]['Bechdel_Rating'])
+					if (isinstance(rating, np.int64)):
+						total += rating
 			scores[ind] = total / num_recs
 		ind += 1
 	return scores
@@ -165,21 +226,24 @@ def average_age_of_director():
 	ids = people_data.index
 	ind = 0
 	for crew in crews:
-		total_age = 0
-		total_dirs = 0
-		for mem in crew:
-			if (mem['department'] == 'Directing'):
-				person_id = int(mem['id'])
-				if (person_id in ids):
-					person_info = people_data.loc[person_id]
-					birthday = person_info['Birthday']
-					if (type(birthday) == str):
-						birthyear = int(birthday[:4])
-						age = year[ind] - birthyear
-						total_dirs += 1
-						total_age += age
-		if (total_dirs != 0):
-			ages[ind] = total_age / total_dirs
+		if (len(crew) == 0):
+			ages[ind] = float('nan')
+		else:
+			total_age = 0
+			total_dirs = 0
+			for mem in crew:
+				if (mem['department'] == 'Directing'):
+					person_id = int(mem['id'])
+					if (person_id in ids):
+						person_info = people_data.loc[person_id]
+						birthday = person_info['Birthday']
+						if ((type(birthday) == str) and (birthday != '')):
+							birthyear = int(birthday[:4])
+							age = year[ind] - birthyear
+							total_dirs += 1
+							total_age += age
+			if (total_dirs != 0):
+				ages[ind] = total_age / total_dirs
 		ind += 1
 	return ages
 
@@ -191,20 +255,23 @@ def average_age_of_cast():
 	ids = people_data.index
 	ind = 0
 	for cast in casts:
-		total_age = 0
-		total_cast = 0
-		for mem in cast:
-			person_id = int(mem['id'])
-			if (person_id in ids):
-				person_info = people_data.loc[person_id]
-				birthday = person_info['Birthday']
-				if (type(birthday) == str):
-					birthyear = int(birthday[:4])
-					age = year[ind] - birthyear
-					total_cast += 1
-					total_age += age
-		if (total_cast != 0):
-			ages[ind] = total_age / total_cast
+		if (len(cast) == 0):
+			ages[ind] = float('nan')
+		else:
+			total_age = 0
+			total_cast = 0
+			for mem in cast:
+				person_id = int(mem['id'])
+				if (person_id in ids):
+					person_info = people_data.loc[person_id]
+					birthday = person_info['Birthday']
+					if ((type(birthday) == str) and (birthday != '')):
+						birthyear = int(birthday[:4])
+						age = year[ind] - birthyear
+						total_cast += 1
+						total_age += age
+			if (total_cast != 0):
+				ages[ind] = total_age / total_cast
 		ind += 1
 	return ages
 
@@ -236,8 +303,10 @@ def ave_pop_directors():
 				if (person_id in ids):
 					person_info = people_data.loc[person_id]
 					pop = person_info['Popularity']
-					total_dirs += 1
-					total_pop += pop
+					# ignore if popularity is 0, because means no data
+					if (pop != 0):
+						total_dirs += 1
+						total_pop += pop
 		if (total_dirs != 0):
 			pops[ind] = total_pop / total_dirs
 		ind += 1
@@ -257,8 +326,10 @@ def ave_pop_cast():
 			if (person_id in ids):
 				person_info = people_data.loc[person_id]
 				pop = person_info['Popularity']
-				total_casts += 1
-				total_pop += pop
+				# ignore if popularity is 0, because means no data
+				if (pop != 0):
+					total_casts += 1
+					total_pop += pop
 		if (total_casts != 0):
 			pops[ind] = total_pop / total_casts
 		ind += 1
@@ -343,8 +414,6 @@ def ave_bechdel_dir_score():
 		ind += 1
 	return scores  
 
-print(ave_bechdel_dir_score())
-
 # print(get_rev_budget_ratio())
 # print(get_female_directing())
 # print(get_female_directing_score())
@@ -352,12 +421,10 @@ print(ave_bechdel_dir_score())
 # print(get_female_cast_score())
 # print(get_female_writing())
 # print(get_female_writing_score())
-# print(recs_passing())
-# print(recs_passing_score())
 # print(recs_passing_avg_score())
 # print(average_age_of_director())
 # print(average_age_of_cast())
 # print(genres_one_hot())
 # print(ave_pop_directors())
 # print(ave_pop_cast())
-
+# print(ave_bechdel_dir_score())
