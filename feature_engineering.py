@@ -1,5 +1,4 @@
-from load_data import get_movies
-from load_data import get_people
+from load_data import get_movies, get_people
 from sklearn.svm import SVC
 import pandas as pd
 import numpy as np
@@ -280,7 +279,7 @@ def average_age_of_cast():
 		ind += 1
 	return ages
 
-# Returns one hot enconding of genres
+# Returns one hot enco ding of genres
 def genres_one_hot(): 
 	df = pd.DataFrame() 
 	genres = ['Western', 'TV Movie', 'Family', 'Comedy', 
@@ -379,12 +378,15 @@ def ave_bechdel_cast_score():
 	for movie_tmdb_id in movie_data.index:
 		cast = movie_data.loc[movie_tmdb_id]['Cast']
 		cast_score = 0
+		cast_size = 0
 		for mem in cast:
 			person_id = int(mem['id'])
 			person_movies = cast_to_movies[person_id]
-			cast_score += sum(map(lambda movie: movie_data.loc[movie]['Bechdel_Rating'], 
-				person_movies))/len(person_movies)
-		scores[ind] = (cast_score / len(cast)) if (len(cast) > 0) else np.nan
+			if len(person_movies) > 1:
+				cast_score += (sum(map(lambda movie: movie_data.loc[movie]['Bechdel_Rating'], 
+					person_movies)) - movie_data.loc[movie_tmdb_id]['Bechdel_Rating'])/(len(person_movies) - 1)
+				cast_size += 1 
+		scores[ind] = (cast_score / cast_size) if (cast_size > 0) else np.nan
 		ind += 1
 	return scores  
 
@@ -408,29 +410,13 @@ def ave_bechdel_dir_score():
 		num_dirs = 0
 		for mem in crew:
 			if (mem['department'] == 'Directing'):
-				num_dirs += 1
 				person_id = int(mem['id'])
 				person_movies = dirs_to_movies[person_id]
-				dir_score += sum(map(lambda movie: movie_data.loc[movie]['Bechdel_Rating'], 
-					person_movies))/len(person_movies)
+				if len(person_movies) > 1:
+					dir_score += (sum(map(lambda movie: movie_data.loc[movie]['Bechdel_Rating'], 
+						person_movies)) - movie_data.loc[movie_tmdb_id]['Bechdel_Rating'])/(len(person_movies) - 1)
+					num_dirs += 1
 		scores[ind] = (dir_score / num_dirs) if (num_dirs > 0) else np.nan
 		ind += 1
 	return scores  
-
-# print(get_rev_budget_ratio())
-# print(get_female_directing())
-# print(get_female_directing_score())
-# print(get_female_cast())
-# print(get_female_cast_score())
-# print(get_female_writing())
-# print(get_female_writing_score())
-# print(recs_passing_avg_score())
-# print(average_age_of_director())
-# print(average_age_of_cast())
-# print(genres_one_hot())
-# print(ave_pop_directors())
-# print(ave_pop_cast())
-# print(first_billed_female())
-# print(ave_bechdel_cast_score())
-# print(ave_bechdel_dir_score())
 
