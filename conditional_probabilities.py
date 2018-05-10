@@ -92,8 +92,8 @@ def female_cast_score_cond_prob():
 	female_writing = fe.get_female_writing_score()
 	bechdel_rating = df['Bechdel_Rating']
 
-	female_writing_0 = female_writing < 0.5
-	female_writing_1 = female_writing >= 0.5
+	female_writing_0 = female_writing < 1
+	female_writing_1 = female_writing >= 2
 
 	bechdel_pass = bechdel_rating == 3
 	print("P(pass | >= 50 percent female writing):", 
@@ -134,6 +134,8 @@ def avg_bechdel_cast_score_cond_prob():
 	print("P(pass | average score of cast is over threshold)", 
 		sum(np.multiply(cast_over_thresh, bechdel_pass)) / sum(cast_over_thresh))
 
+avg_bechdel_cast_score_cond_prob()
+
 def avg_bechdel_dir_score_cond_prob(): 
 	dir_avg = fe.ave_bechdel_dir_score()
 	bechdel_rating = df['Bechdel_Rating']
@@ -147,6 +149,8 @@ def avg_bechdel_dir_score_cond_prob():
 		sum(np.multiply(dir_under_thresh, bechdel_fail)) / sum(dir_under_thresh))
 	print("P(pass | average score of directors is over threshold)", 
 		sum(np.multiply(dir_over_thresh, bechdel_pass)) / sum(dir_over_thresh))
+
+avg_bechdel_dir_score_cond_prob()
 
 def avg_dir_age_cond_prob(): 
 	cast_avg = fe.average_age_of_cast()

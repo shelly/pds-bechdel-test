@@ -9,7 +9,7 @@ import numpy as np
 from load_data import get_movies, get_people
 
 movies = get_movies()
-people = get_people().set_index('TMDB_ID')
+# people = get_people().set_index('TMDB_ID')
 
 def passing_over_year():
 	map_to_decades = movies['Year'].apply(lambda year: year // 10 * 10)
@@ -32,6 +32,8 @@ def passing_over_year():
 	plt.legend((p0[0], p1[0], p2[0], p3[0]), ('0', '1', '2', '3'))
 
 	plt.show()
+
+passing_over_year()
 
 def passing_over_budget():
 	# Buckets of $10 million 

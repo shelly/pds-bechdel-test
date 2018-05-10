@@ -1,5 +1,4 @@
 from load_data import get_movies, get_people
-from sklearn.svm import SVC
 import pandas as pd
 import numpy as np
 from functools import reduce 
@@ -210,7 +209,7 @@ def recs_passing_avg_score():
 				if (movie_id in movie_by_id.index):
 					rating = (movie_by_id.loc[movie_id]['Bechdel_Rating'])
 					if (isinstance(rating, np.int64)):
-						total += (rating == 3)
+						total += rating
 						tot_recs += 1
 			if (tot_recs != 0):
 				scores[ind] = total / tot_recs
@@ -383,7 +382,7 @@ def ave_bechdel_cast_score():
 			person_id = int(mem['id'])
 			person_movies = cast_to_movies[person_id]
 			if len(person_movies) > 1:
-				cast_score += (sum(map(lambda movie: (movie_data.loc[movie]['Bechdel_Rating'] == 3), 
+				cast_score += (sum(map(lambda movie: (movie_data.loc[movie]['Bechdel_Rating']), 
 					person_movies)) - movie_data.loc[movie_tmdb_id]['Bechdel_Rating'])/(len(person_movies) - 1)
 				cast_size += 1 
 		scores[ind] = (cast_score / cast_size) if (cast_size > 0) else np.nan
@@ -413,7 +412,7 @@ def ave_bechdel_dir_score():
 				person_id = int(mem['id'])
 				person_movies = dirs_to_movies[person_id]
 				if len(person_movies) > 1:
-					dir_score += (sum(map(lambda movie: (movie_data.loc[movie]['Bechdel_Rating'] == 3), 
+					dir_score += (sum(map(lambda movie: (movie_data.loc[movie]['Bechdel_Rating']), 
 						person_movies)) - movie_data.loc[movie_tmdb_id]['Bechdel_Rating'])/(len(person_movies) - 1)
 					num_dirs += 1
 		scores[ind] = (dir_score / num_dirs) if (num_dirs > 0) else np.nan
