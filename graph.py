@@ -45,5 +45,5 @@ for (index, row) in cur_df.iterrows():
         graph.append((cur_tmbd,rec))
         b_vals.append(str(colour))
 
-draw_graph(graph, node_color=b_vals)
+draw_graph(graph)
 
