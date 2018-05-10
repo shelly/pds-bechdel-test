@@ -42,22 +42,36 @@ def passing_over_year():
 
 	plt.show()
 
-passing_over_year()
+def passing_over_genre():
+	map_to_genres = movies['Genres'].apply(lambda genres: [genre['name'] for genre in genres])
+	ind = ['Western', 'TV Movie', 'Family', 'Comedy', 
+			  'Action', 'Crime', 'Horror', 'Animation', 
+			  'Thriller', 'Adventure', 'Fantasy', 'War', 
+			  'Science Fiction', 'Drama', 'Documentary', 
+			  'History', 'Mystery', 'Romance', 'Music'] 
+	y_data = [[0]*len(ind) for label in range(0, 4)]
 
-def passing_over_budget():
-	# Buckets of $10 million 
-	budgets = movies['Budget'][movies['Budget'] > 0]
-	map_to_bud = budgets.apply(lambda year: int(year) // 10000000 * 10000000)
-	ind = list(range(0, 210000000, 10000000))
-
-	y_data = [0]*len(ind)
 	for i in range(len(ind)):
-		if (ind[i] == 200000000):
-			y_data[i] = (map_to_bud[map_to_bud >= ind[i]]).shape[0]
-		else:
-			y_data[i] = (map_to_bud[map_to_bud == ind[i]]).shape[0]
+		for label in range(0, 4):
+			bucket = ind[i]
+			y_data[label][i] = 100*(movies[
+			(map_to_genres.apply(lambda genres: bucket in genres)) & (movies[
+			'Bechdel_Rating'] == label)].shape[0]) / (movies[map_to_genres.apply(lambda genres: bucket in genres)].shape[0])
 
-	bar_width = 0.5
-	plt.bar(range(len(ind)), y_data, width=bar_width)
-	plt.xticks(range(len(ind)), tuple(map(lambda x: x // 10000000, ind)))
+	line_width = 1
+	edge_color = 'black'
+
+	p0 = plt.bar(ind, y_data[3], edgecolor=edge_color, linewidth=line_width, color='green')
+	p1 = plt.bar(ind, y_data[2], edgecolor=edge_color, linewidth=line_width, bottom=y_data[3], color='yellow')
+	p2 = plt.bar(ind, y_data[1], edgecolor=edge_color, linewidth=line_width, bottom=list(map(lambda x, y: x + y, y_data[3], y_data[2])), color='orange')
+	p3 = plt.bar(ind, y_data[0], edgecolor=edge_color, linewidth=line_width, bottom=list(map(lambda x, y, z: x + y + z, y_data[3], y_data[2], y_data[1])), color='red')
+
+	plt.legend((p0[0], p1[0], p2[0], p3[0]), ('0', '1', '2', '3'))
+	plt.title("Bechdel Test Scores by Genre")
+	plt.xticks(rotation=90)
+	plt.xlabel("Genre")
+	plt.ylabel("Percent of Movies")
+
 	plt.show()
+
+passing_over_genre()
