@@ -7,8 +7,9 @@ from sklearn import mixture
 from sklearn.naive_bayes import GaussianNB
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.cluster import KMeans
-import matplotlib.pyplot as plt
+from sklearn.cross_validation import cross_val_score
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
@@ -101,8 +102,9 @@ print("Testing accuracy: ", clf.score(X_test, y_test_bin))
 
 print("Zero: ", sum(y_test_bin == np.zeros(y_test_bin.shape[0]))/y_test_bin.shape[0])
 print("One: ", sum(y_test_bin == np.ones(y_test_bin.shape[0]))/y_test_bin.shape[0])
-print("Two: ", sum(y_test_bin == (2*np.ones(y_test_bin.shape[0])))/y_test_bin.shape[0])
-print("Three: ", sum(y_test_bin == (3*np.ones(y_test_bin.shape[0])))/y_test_bin.shape[0])
+
+scores = cross_val_score(clf, X_train, X_test, cv=5)
+print("Cross Val: ", scores)
 
 print("#################")
 
@@ -120,6 +122,9 @@ print("One: ", sum(y_test == np.ones(y_test.shape[0]))/y_test.shape[0])
 print("Two: ", sum(y_test == (2*np.ones(y_test.shape[0])))/y_test.shape[0])
 print("Three: ", sum(y_test == (3*np.ones(y_test.shape[0])))/y_test.shape[0])
 
+scores = cross_val_score(clf, X_train, X_test, cv=5)
+print("Cross Val: ", scores)
+
 print("#################")
 
 print("DT Max Depth 3")
@@ -133,6 +138,9 @@ print("One: ", sum(y_test == np.ones(y_test.shape[0]))/y_test.shape[0])
 print("Two: ", sum(y_test == (2*np.ones(y_test.shape[0])))/y_test.shape[0])
 print("Three: ", sum(y_test == (3*np.ones(y_test.shape[0])))/y_test.shape[0])
 
+scores = cross_val_score(clf, X_train, X_test, cv=5)
+print("Cross Val: ", scores)
+
 print("#################")
 
 print("DT Max Depth 4; binary")
@@ -143,8 +151,9 @@ print("Testing accuracy: ", clf.score(X_test, y_test_bin))
 
 print("Zero: ", sum(y_test_bin == np.zeros(y_test_bin.shape[0]))/y_test_bin.shape[0])
 print("One: ", sum(y_test_bin == np.ones(y_test_bin.shape[0]))/y_test_bin.shape[0])
-print("Two: ", sum(y_test_bin == (2*np.ones(y_test_bin.shape[0])))/y_test_bin.shape[0])
-print("Three: ", sum(y_test_bin == (3*np.ones(y_test_bin.shape[0])))/y_test_bin.shape[0])
+
+scores = cross_val_score(clf, X_train, X_test, cv=5)
+print("Cross Val: ", scores)
 
 print("#################")
 
@@ -172,6 +181,9 @@ print("One: ", sum(y_test == np.ones(y_test.shape[0]))/y_test.shape[0])
 print("Two: ", sum(y_test == (2*np.ones(y_test.shape[0])))/y_test.shape[0])
 print("Three: ", sum(y_test == (3*np.ones(y_test.shape[0])))/y_test.shape[0])
 
+scores = cross_val_score(clf, X_train, X_test, cv=5)
+print("Cross Val: ", scores)
+
 print("#################")
 
 print("Multinomial Bayes")
@@ -186,5 +198,8 @@ print("Zero: ", sum(y_test == np.zeros(y_test.shape[0]))/y_test.shape[0])
 print("One: ", sum(y_test == np.ones(y_test.shape[0]))/y_test.shape[0])
 print("Two: ", sum(y_test == (2*np.ones(y_test.shape[0])))/y_test.shape[0])
 print("Three: ", sum(y_test == (3*np.ones(y_test.shape[0])))/y_test.shape[0])
+
+scores = cross_val_score(clf, X_train, X_test, cv=5)
+print("Cross Val: ", scores)
 
 print("#################")
