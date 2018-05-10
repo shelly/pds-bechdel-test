@@ -382,7 +382,7 @@ def ave_bechdel_cast_score():
 			person_id = int(mem['id'])
 			person_movies = cast_to_movies[person_id]
 			if len(person_movies) > 1:
-				cast_score += (sum(map(lambda movie: (movie_data.loc[movie]['Bechdel_Rating']), 
+				cast_score += (sum(map(lambda movie: movie_data.loc[movie]['Bechdel_Rating'], 
 					person_movies)) - movie_data.loc[movie_tmdb_id]['Bechdel_Rating'])/(len(person_movies) - 1)
 				cast_size += 1 
 		scores[ind] = (cast_score / cast_size) if (cast_size > 0) else np.nan
@@ -412,7 +412,7 @@ def ave_bechdel_dir_score():
 				person_id = int(mem['id'])
 				person_movies = dirs_to_movies[person_id]
 				if len(person_movies) > 1:
-					dir_score += (sum(map(lambda movie: (movie_data.loc[movie]['Bechdel_Rating']), 
+					dir_score += (sum(map(lambda movie: movie_data.loc[movie]['Bechdel_Rating'], 
 						person_movies)) - movie_data.loc[movie_tmdb_id]['Bechdel_Rating'])/(len(person_movies) - 1)
 					num_dirs += 1
 		scores[ind] = (dir_score / num_dirs) if (num_dirs > 0) else np.nan
