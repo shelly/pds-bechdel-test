@@ -34,7 +34,7 @@ def count_loc(lines):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python get_tutorial_length.py <tutorial .ipynb file>")
+        print("Usage: python count_length.py <tutorial .ipynb file>")
 
     with open(sys.argv[1]) as f:
         data = json.load(f)
