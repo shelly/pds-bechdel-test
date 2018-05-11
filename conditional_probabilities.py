@@ -118,8 +118,6 @@ def avg_rec_cond_prob():
 	print("P(pass | average score of recs is over threshold)", 
 		sum(np.multiply(rec_over_thresh, bechdel_pass)) / sum(rec_over_thresh))
 
-avg_rec_cond_prob()
-
 def avg_bechdel_cast_score_cond_prob(): 
 	cast_avg = fe.ave_bechdel_cast_score()
 	bechdel_rating = df['Bechdel_Rating']
@@ -134,7 +132,6 @@ def avg_bechdel_cast_score_cond_prob():
 	print("P(pass | average score of cast is over threshold)", 
 		sum(np.multiply(cast_over_thresh, bechdel_pass)) / sum(cast_over_thresh))
 
-avg_bechdel_cast_score_cond_prob()
 
 def avg_bechdel_dir_score_cond_prob(): 
 	dir_avg = fe.ave_bechdel_dir_score()

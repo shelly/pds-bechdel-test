@@ -8,6 +8,7 @@ movie_data = get_movies()
 movie_by_id = movie_data.set_index('TMDB_ID')
 people_data = get_people()
 people_data = people_data.set_index('TMDB_ID')
+print(len(movie_data.loc[31997]))
 
 # Returns Revenue/Budget ratio
 def get_rev_budget_ratio():
@@ -419,3 +420,4 @@ def ave_bechdel_dir_score():
 		ind += 1
 	return scores  
 
+ave_bechdel_dir_score()
