@@ -1,7 +1,7 @@
 import requests, time  
 import pandas as pd 
 
-api_key = 'a4a3dc6220c1d494515cbef159badb43'
+api_key = 'API_KEY' 
 base_tmdb_url = 'http://api.themoviedb.org/3'
 
 bechdel_data = pd.read_csv('bechdel_test_data.csv', dtype=object, names=['Title', 
